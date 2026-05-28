@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-padel-dark: #0B0C10;
+  --color-padel-card: #1F2833;
+  --color-padel-gray: #C5C6C7;
+  --color-padel-teal: #66FCF1;
+  --color-padel-red: #ED1C24;
+  --color-padel-gold: #FFD700;
+
+  --font-sans: "Outfit", "Inter", sans-serif;
+}
+
+/* Kustomisasi global tambahan untuk scrollbar futuristik dan reset */
+html, body {
+  background-color: var(--color-padel-dark);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Animasi pendaran glow */
+@keyframes pulse-glow {
+  0%, 100% {
+    text-shadow: 0 0 4px rgba(102, 252, 241, 0.4), 0 0 10px rgba(102, 252, 241, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(102, 252, 241, 0.8), 0 0 20px rgba(102, 252, 241, 0.4);
+  }
+}
+
+.animate-glow {
+  animation: pulse-glow 3s infinite;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(31, 40, 51, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
