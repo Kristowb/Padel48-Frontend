@@ -2,6 +2,10 @@
 import { shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { TresCanvas } from '@tresjs/core'
+import zeeImg from '../assets/zee.png'
+import freyaImg from '../assets/freya.png'
+import graciaImg from '../assets/gracia.png'
+import christyImg from '../assets/christy.png'
 
 // Data member JKT48 untuk spotlight
 const members = [
@@ -9,28 +13,28 @@ const members = [
     id: 1,
     name: 'Zee JKT48',
     status: 'Active Mabar',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+    image: zeeImg,
     mabarPrice: 'Rp 500,000'
   },
   {
     id: 2,
     name: 'Freya JKT48',
     status: 'Active Mabar',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+    image: freyaImg,
     mabarPrice: 'Rp 450,000'
   },
   {
     id: 3,
     name: 'Gracia JKT48',
     status: 'Active Mabar',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+    image: graciaImg,
     mabarPrice: 'Rp 500,000'
   },
   {
     id: 4,
     name: 'Christy JKT48',
     status: 'Active Mabar',
-    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+    image: christyImg,
     mabarPrice: 'Rp 450,000'
   }
 ]

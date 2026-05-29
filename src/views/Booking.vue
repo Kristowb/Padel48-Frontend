@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import zeeImg from '../assets/zee.png'
+import freyaImg from '../assets/freya.png'
+import graciaImg from '../assets/gracia.png'
+import christyImg from '../assets/christy.png'
 
 const router = useRouter()
 
@@ -11,10 +15,10 @@ const courts = [
 ]
 
 const jkt48Members = [
-  { id: 'e81c1c1c-99a2-4a8e-b88e-1d2208f51199', name: 'Zee JKT48', extraPrice: 500000, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
-  { id: 'f72c2c2c-88a2-4b8e-a88e-1d2208f52288', name: 'Freya JKT48', extraPrice: 450000, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80' },
-  { id: 'g63c3c3c-77a2-4c8e-a88e-1d2208f53399', name: 'Gracia JKT48', extraPrice: 500000, avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80' },
-  { id: 'h54c4c4c-66a2-4d8e-a88e-1d2208f54400', name: 'Christy JKT48', extraPrice: 450000, avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&auto=format&fit=crop&q=80' }
+  { id: 'e81c1c1c-99a2-4a8e-b88e-1d2208f51199', name: 'Zee JKT48', extraPrice: 500000, avatar: zeeImg },
+  { id: 'f72c2c2c-88a2-4b8e-a88e-1d2208f52288', name: 'Freya JKT48', extraPrice: 450000, avatar: freyaImg },
+  { id: 'g63c3c3c-77a2-4c8e-a88e-1d2208f53399', name: 'Gracia JKT48', extraPrice: 500000, avatar: graciaImg },
+  { id: 'h54c4c4c-66a2-4d8e-a88e-1d2208f54400', name: 'Christy JKT48', extraPrice: 450000, avatar: christyImg }
 ]
 
 // Slot Waktu bermain
@@ -109,12 +113,34 @@ const submitBooking = async () => {
 </script>
 
 <template>
-  <div class="relative min-h-screen bg-padel-dark text-white p-4 sm:p-6 lg:p-8">
-    <div class="max-w-4xl mx-auto flex flex-col space-y-8">
+  <div class="relative min-h-screen bg-padel-dark text-white p-4 sm:p-6 lg:p-8 pb-32">
+    <!-- Background Decor (Glow Orbs) -->
+    <div class="absolute top-20 left-1/4 w-96 h-96 rounded-full bg-padel-teal/5 blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-20 right-1/4 w-96 h-96 rounded-full bg-padel-red/5 blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto flex flex-col space-y-6 z-10 relative">
+      <!-- Step Progress Indicator -->
+      <div class="flex items-center justify-center gap-4 text-xs font-semibold tracking-wider uppercase mb-2">
+        <span class="text-padel-teal flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-padel-teal text-padel-dark flex items-center justify-center font-bold">1</span>
+          Select Slot
+        </span>
+        <span class="w-8 h-px bg-white/10"></span>
+        <span class="text-padel-gray flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px]">2</span>
+          Payment
+        </span>
+        <span class="w-8 h-px bg-white/10"></span>
+        <span class="text-padel-gray flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px]">3</span>
+          Ticket
+        </span>
+      </div>
+
       <!-- Header -->
-      <div class="text-center flex flex-col space-y-2">
+      <div class="text-center flex flex-col space-y-1 mb-4">
         <h1 class="text-3xl font-extrabold text-white tracking-tight">Formulir Booking Lapangan</h1>
-        <p class="text-sm text-padel-gray">Pilih sesi reguler atau sesi mabar seru bareng member JKT48 pilihanmu.</p>
+        <p class="text-xs text-padel-gray">Pilih sesi reguler atau sesi mabar seru bareng member JKT48 pilihanmu.</p>
       </div>
 
       <!-- Form Container -->
@@ -136,31 +162,42 @@ const submitBooking = async () => {
           <div class="flex flex-col space-y-2">
             <label class="text-xs font-bold uppercase tracking-wider text-padel-gray">Tipe Sesi Bermain:</label>
             <div class="grid grid-cols-2 gap-3">
+              <!-- Sesi Reguler -->
               <button type="button" @click="selectSessionType('REGULAR')"
-                      :class="form.sessionType === 'REGULAR' ? 'border-padel-teal bg-padel-teal/10 text-padel-teal' : 'border-white/10 text-padel-gray hover:text-white'"
-                      class="px-4 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300">
+                      :class="form.sessionType === 'REGULAR' 
+                        ? 'border-padel-teal bg-padel-teal/10 text-padel-teal shadow-[0_0_12px_rgba(102,252,241,0.2)]' 
+                        : 'border-white/10 text-padel-gray hover:text-white'"
+                      class="px-4 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]">
                 Sesi Reguler
               </button>
+              
+              <!-- Sesi Mabar JKT48 -->
               <button type="button" @click="selectSessionType('MABAR')"
-                      :class="form.sessionType === 'MABAR' ? 'border-padel-gold bg-padel-gold/10 text-padel-gold' : 'border-white/10 text-padel-gray hover:text-white'"
-                      class="px-4 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5">
+                      :class="form.sessionType === 'MABAR' 
+                        ? 'border-padel-red bg-padel-red/10 text-padel-red shadow-[0_0_12px_rgba(237,28,36,0.2)]' 
+                        : 'border-white/10 text-padel-gray hover:text-white'"
+                      class="px-4 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99]">
                 ⭐ Mabar JKT48
               </button>
             </div>
           </div>
 
-          <!-- Pilihan Member JKT48 (Jika Mabar) -->
+          <!-- Pilihan Member JKT48 (Hanya jika Mabar dipilih) -->
           <div v-if="form.sessionType === 'MABAR'" class="flex flex-col space-y-3">
             <label class="text-xs font-bold uppercase tracking-wider text-padel-gray">Pilih Teman Mabar JKT48:</label>
             <div class="grid grid-cols-2 gap-3">
               <div v-for="member in jkt48Members" :key="member.id"
                    @click="form.memberId = member.id"
-                   :class="form.memberId === member.id ? 'border-padel-red bg-padel-red/5' : 'border-white/5 bg-black/20 hover:border-white/10'"
-                   class="p-3 border rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-300">
-                <img :src="member.avatar" :alt="member.name" class="w-10 h-10 rounded-full object-cover border border-white/20" />
+                   :class="form.memberId === member.id 
+                     ? 'border-padel-red bg-padel-red/10 text-padel-red shadow-[0_0_15px_rgba(237,28,36,0.3)]' 
+                     : 'border-white/5 bg-black/30 hover:border-padel-red/40 hover:shadow-[0_0_10px_rgba(237,28,36,0.15)]'"
+                   class="group p-3 border rounded-xl flex items-center gap-3 cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+                <!-- Circular Avatar with Hover Glow -->
+                <img :src="member.avatar" :alt="member.name" 
+                     class="w-10 h-10 rounded-full object-cover border-2 border-white/20 group-hover:border-padel-red group-hover:shadow-[0_0_12px_rgba(237,28,36,0.8)] transition-all duration-300" />
                 <div class="flex flex-col">
-                  <span class="text-xs font-bold text-white">{{ member.name.split(' ')[0] }}</span>
-                  <span class="text-[9px] text-padel-gold">+{{ member.extraPrice / 1000 }}K</span>
+                  <span class="text-xs font-bold text-white group-hover:text-padel-red transition-colors duration-300">{{ member.name.split(' ')[0] }}</span>
+                  <span class="text-[9px] text-padel-gold font-semibold">+{{ (member.extraPrice).toLocaleString('id-ID') }}</span>
                 </div>
               </div>
             </div>
@@ -172,8 +209,10 @@ const submitBooking = async () => {
             <div class="flex gap-2 justify-between">
               <button v-for="day in days" :key="day.date" type="button"
                       @click="form.date = day.date"
-                      :class="form.date === day.date ? 'border-padel-teal bg-padel-teal text-padel-dark' : 'border-white/10 text-padel-gray hover:text-white'"
-                      class="flex-1 py-2 border rounded-xl flex flex-col items-center justify-center text-center transition-all duration-300">
+                      :class="form.date === day.date 
+                        ? 'border-padel-teal bg-padel-teal/15 text-padel-teal shadow-[0_0_10px_rgba(102,252,241,0.25)]' 
+                        : 'border-white/10 text-padel-gray hover:text-white'"
+                      class="flex-1 py-2 border rounded-xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.03]">
                 <span class="text-[9px] uppercase font-bold">{{ day.label }}</span>
                 <span class="text-sm font-black">{{ day.date.split('-')[2] }}</span>
               </button>
@@ -190,11 +229,16 @@ const submitBooking = async () => {
               <button v-for="slot in timeSlots" :key="slot.id" type="button"
                       :disabled="slot.booked"
                       @click="form.timeSlot = `${slot.start.slice(0,5)} - ${slot.end.slice(0,5)}`"
+                      :style="slot.booked 
+                        ? { background: 'repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 5px, transparent 5px, transparent 10px)' } 
+                        : {}"
                       :class="[
-                        slot.booked ? 'opacity-30 cursor-not-allowed bg-white/5 border-dashed border-white/10 text-padel-gray' : '',
+                        slot.booked 
+                          ? 'opacity-30 cursor-not-allowed border-dashed border-white/10 text-padel-gray' 
+                          : 'border-white/10 hover:border-padel-teal/40 hover:scale-[1.01] text-white',
                         form.timeSlot === `${slot.start.slice(0,5)} - ${slot.end.slice(0,5)}` 
-                          ? 'border-padel-teal bg-padel-teal/15 text-padel-teal' 
-                          : 'border-white/10 hover:border-white/20 text-white'
+                          ? 'border-padel-teal bg-padel-teal/20 text-padel-teal shadow-[0_0_10px_rgba(102,252,241,0.2)]' 
+                          : ''
                       ]"
                       class="py-2.5 border rounded-xl text-xs font-semibold transition-all duration-300">
                 {{ slot.start.slice(0,5) }} - {{ slot.end.slice(0,5) }}
@@ -207,31 +251,57 @@ const submitBooking = async () => {
             <label class="text-xs font-bold uppercase tracking-wider text-padel-gray">Data Kontak Pemesan:</label>
             
             <input v-model="form.name" type="text" placeholder="Nama Lengkap" 
-                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:outline-none" />
+                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:shadow-[0_0_10px_rgba(102,252,241,0.15)] focus:outline-none transition-all duration-300" />
             
             <input v-model="form.email" type="email" placeholder="Alamat Email" 
-                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:outline-none" />
+                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:shadow-[0_0_10px_rgba(102,252,241,0.15)] focus:outline-none transition-all duration-300" />
             
             <input v-model="form.phone" type="text" placeholder="Nomor WhatsApp (08xxx)" 
-                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:outline-none" />
-          </div>
-
-          <!-- Biaya & Checkout CTA -->
-          <div class="pt-6 border-t border-white/5 flex flex-col space-y-4">
-            <div class="flex justify-between items-center text-sm">
-              <span class="text-padel-gray font-semibold">Total Biaya Pemesanan:</span>
-              <span class="text-2xl font-black text-padel-teal">Rp {{ totalAmount.toLocaleString('id-ID') }}</span>
-            </div>
-            
-            <button type="button" @click="submitBooking" :disabled="loading"
-                    class="w-full py-3.5 rounded-xl bg-padel-teal text-padel-dark font-extrabold text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-              <span v-if="loading" class="w-4 h-4 border-2 border-padel-dark border-t-transparent rounded-full animate-spin"></span>
-              {{ loading ? 'Memproses Booking...' : 'Lanjut ke Pembayaran QRIS' }}
-            </button>
+                   class="w-full bg-padel-card border border-white/10 rounded-xl px-4 py-2.5 text-xs focus:border-padel-teal focus:shadow-[0_0_10px_rgba(102,252,241,0.15)] focus:outline-none transition-all duration-300" />
           </div>
         </div>
 
       </div>
     </div>
+
+    <!-- Floating Bottom Checkout Summary Bar -->
+    <div class="fixed bottom-0 left-0 right-0 z-30 glass-panel border-t border-white/10 py-4 px-6 md:px-12 backdrop-blur-xl bg-black/60 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+        <!-- Rincian Ringkasan -->
+        <div class="flex flex-col text-center sm:text-left">
+          <span class="text-[10px] text-padel-gray font-bold uppercase tracking-widest">Ringkasan Checkout</span>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-sm font-semibold text-white">
+              {{ form.sessionType === 'MABAR' ? 'Sesi Mabar JKT48' : 'Sesi Reguler' }}
+            </span>
+            <span class="text-xs text-padel-gray">|</span>
+            <span class="text-xs text-padel-teal font-mono">
+              {{ form.timeSlot ? form.timeSlot : 'Slot Belum Dipilih' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Biaya & Tombol CTA -->
+        <div class="flex items-center gap-6">
+          <div class="flex flex-col text-right">
+            <span class="text-[9px] text-padel-gray font-bold uppercase tracking-wider">Total Pembayaran</span>
+            <span class="text-2xl font-black text-padel-teal tracking-tight">Rp {{ totalAmount.toLocaleString('id-ID') }}</span>
+          </div>
+          
+          <button type="button" @click="submitBooking" :disabled="loading"
+                  class="px-8 py-3.5 rounded-xl bg-padel-teal text-padel-dark font-black text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-[0_0_20px_rgba(102,252,241,0.4)] disabled:opacity-50 disabled:cursor-not-allowed">
+            <span v-if="loading" class="w-4 h-4 border-2 border-padel-dark border-t-transparent rounded-full animate-spin"></span>
+            {{ loading ? 'Memproses...' : 'Proceed to Payment' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* Transisi focus dan hover styling */
+input:focus {
+  border-color: var(--color-padel-teal);
+}
+</style>

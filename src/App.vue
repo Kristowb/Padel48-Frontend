@@ -11,7 +11,8 @@ import { RouterView, RouterLink } from 'vue-router'
           <!-- Logo -->
           <div class="flex-shrink-0 flex items-center">
             <RouterLink to="/" class="text-2xl font-extrabold tracking-wider text-padel-teal flex items-center gap-2">
-              <span class="text-padel-red">PADEL</span>48
+              <img src="/favicon.png" alt="Padel48 Logo" class="w-8 h-8 object-contain rounded-md" />
+              <span><span class="text-padel-red">PADEL</span>48</span>
               <span class="w-2.5 h-2.5 rounded-full bg-padel-red animate-pulse"></span>
             </RouterLink>
           </div>

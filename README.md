@@ -60,14 +60,17 @@ Platform ini dibagi menjadi dua subsistem utama: **Aplikasi Pengguna (Public Web
     *   Detail informasi lapangan tradisional (harga per jam, ukuran, fasilitas penunjang) ditampilkan di sisi samping canvas dengan layout responsif Tailwind CSS.
 
 #### 3. Pemilihan Sesi & Member (`Booking.vue`)
-*   **Deskripsi**: Formulir interaktif untuk menentukan tanggal, waktu, dan jenis sesi booking.
-*   **Alur Booking**:
-    1.  **Pilih Tanggal**: Kalender interaktif mingguan dengan transisi CSS yang mulus.
-    2.  **Pilih Sesi & Penugasan Member**:
-        *   Jika memilih sesi "Mabar JKT48", antarmuka akan menampilkan avatar 3D mini atau animasi hover dinamis dari member JKT48 yang *available* pada tanggal/waktu tersebut.
-    3.  **Pilih Slot Waktu**: Frontend memanggil API ketersediaan slot (`GET /api/v1/courts/{id}/slots?date=YYYY-MM-DD`). Slot yang sudah dipesan akan berstatus *disabled* dengan overlay warna abu-abu semi-transparan khas Tailwind.
-    4.  **Isi Data Diri**: Pengguna memasukkan Nama, Email, dan WhatsApp.
-    5.  **Konfirmasi**: Tombol *"Lanjut ke Pembayaran"*.
+*   **Deskripsi**: Formulir interaktif premium dengan tata letak dua kolom (*split-column* untuk desktop) guna memilih lapangan, tanggal, tipe sesi, slot waktu bermain, dan pengisian data kontak pemesan secara aman.
+*   **Fitur Visual & Alur Booking**:
+    1.  **Step Progress Indicator**: Bar panduan di bagian atas yang melacak progres pemesanan secara visual (*1. Select Slot -> 2. Payment -> 3. Ticket*) dengan penomoran lingkaran ber-glow neon teal.
+    2.  **Tipe Sesi Bermain**: Opsi pilihan sesi menggunakan tombol kartu bersinar:
+        *   **Sesi Reguler**: Desain minimalis dengan aksen neon teal.
+        *   **Sesi Mabar JKT48**: Aksen VIP ber-glow merah khas JKT48 disertai ikon bintang.
+    3.  **Member Selection Grid (Khusus Sesi Mabar)**: Menampilkan pilihan member JKT48 (seperti Zee, Freya, Gracia, Christy) yang tersedia pada tanggal tersebut. Setiap kartu memiliki avatar bulat dengan pinggiran yang memancarkan efek *glow* merah saat di-hover dan lencana harga tambahan (misal: *+Rp 500.000*).
+    4.  **Aset Gambar Lokal (Bebas Masalah CORS)**: Foto potret realistis member JKT48 disimpan secara lokal di folder `src/assets/` (`zee.png`, `freya.png`, `gracia.png`, `christy.png`) untuk menghindari pembatasan lintas-domain (*CORS/hotlinking block*).
+    5.  **Weekly Calendar Selector**: Baris selector tanggal mingguan horizontal dengan border neon teal menyala untuk menandai tanggal aktif yang dipilih.
+    6.  **Time Slot Grid**: Grid tombol 1 jam sesi bermain. Slot waktu yang sudah dipesan (*booked/unavailable*) dinonaktifkan (*disabled*) dan diisi dengan pola arsir garis diagonal (*diagonal stripe overlay*) agar mudah dibedakan.
+    7.  **Floating Bottom Checkout Summary Bar**: Bilah ringkasan yang selalu melayang (*sticky*) di bagian bawah layar. Bilah ini menampilkan ringkasan lapangan, sesi, slot waktu yang dipilih, kalkulasi total harga secara real-time, dan tombol utama *Proceed to Payment* dengan micro-animation hover scale.
 
 #### 4. Checkout & Pembayaran QRIS (`Invoice.vue`)
 *   **Deskripsi**: Halaman checkout pesanan dan tampilan QRIS dinamis untuk pembayaran.
