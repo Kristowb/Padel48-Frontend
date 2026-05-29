@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-padel-dark: #0B0C10;
-  --color-padel-card: #1F2833;
-  --color-padel-gray: #C5C6C7;
-  --color-padel-teal: #66FCF1;
-  --color-padel-red: #ED1C24;
-  --color-padel-gold: #FFD700;
+  --color-padel-dark: #003B36;  /* Hijau botol gelap */
+  --color-padel-card: #004D46;  /* Hijau botol medium */
+  --color-padel-gray: #C5D0CD;  /* Abu-abu kehijauan lembut */
+  --color-padel-teal: #CCFF00;  /* Kuning Limau / Lime solid */
+  --color-padel-red: #A61C22;   /* Merah Delima Sporty */
+  --color-padel-gold: #E3FF37;  /* Kuning Limau Terang */
 
   --font-sans: "Outfit", "Inter", sans-serif;
 }
 
 /* Kustomisasi global tambahan untuk scrollbar futuristik dan reset */
 html, body {
-  background-color: var(--color-padel-dark);
+  background-color: #000E0D;
   color: #ffffff;
   font-family: var(--font-sans);
   margin: 0;
@@ -21,24 +21,226 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Animasi pendaran glow */
-@keyframes pulse-glow {
-  0%, 100% {
-    text-shadow: 0 0 4px rgba(102, 252, 241, 0.4), 0 0 10px rgba(102, 252, 241, 0.2);
-  }
-  50% {
-    text-shadow: 0 0 10px rgba(102, 252, 241, 0.8), 0 0 20px rgba(102, 252, 241, 0.4);
-  }
+/* Solid Panel dengan gaya Glassmorphism pekat */
+.solid-panel {
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-.animate-glow {
-  animation: pulse-glow 3s infinite;
+/* Dynamic Theming Aksen */
+.theme-jkt48 {
+  --color-padel-teal: #A61C22;
 }
 
-/* Glassmorphism utility */
-.glass-panel {
-  background: rgba(31, 40, 51, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.theme-regular {
+  --color-padel-teal: #CCFF00;
 }
+
+/* Keyframes Marquee Running Text */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Onboarding Transition Utilities */
+.writing-vertical {
+  writing-mode: vertical-lr;
+}
+
+/* Tata Letak Seksi Halaman Utama Tanpa Snap-Scroll (Aksesibilitas Premium) */
+.snap-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+.snap-slide {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+/* Kelas Utilitas Kunci Scroll Body saat Mobile Menu Terbuka */
+body.scroll-locked {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+/* Custom Router Link Active Styles */
+.active-link {
+  color: var(--color-padel-teal) !important;
+}
+
+.exact-active-link {
+  border-color: var(--color-padel-teal) !important;
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
+}
+
+/* --- Animasi Mikro & Transisi Kustom --- */
+
+/* 1. Transisi Sesi Mabar (Fade Slide) */
+.fade-slide-enter-active, .fade-slide-leave-active {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-slide-enter-from, .fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* 2. Slide Up Checkout Bar */
+.slide-up-enter-active, .slide-up-leave-active {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+.slide-up-enter-from, .slide-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* 3. Slide Fade Horizontal (Tab Switcher) */
+.slide-fade-horizontal-enter-active, .slide-fade-horizontal-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-fade-horizontal-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.slide-fade-horizontal-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* 4. Fade Scale (Pergantian Lapangan) */
+.fade-scale-enter-active, .fade-scale-leave-active {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-scale-enter-from, .fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
+}
+
+/* 5. Hologram Sweep Animation */
+@keyframes hologramSweep {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hologram-effect {
+  background-size: 200% 200%;
+  animation: hologramSweep 8s ease infinite;
+}
+
+/* 6. Success Tick Animation (SVG Checkmark) */
+@keyframes strokeDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes successScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.success-checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #CCFF00;
+  fill: none;
+  animation: strokeDraw 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.success-checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: strokeDraw 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+.success-badge-pulse {
+  animation: successScale 0.4s ease-in-out 0.9s;
+}
+
+/* 7. Animasi Staggered Item (Fasilitas) */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-item {
+  opacity: 0;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animasi Garis Bawah Navigasi Desktop (Best Practice UI/UX) */
+.nav-link-underline {
+  position: relative;
+}
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-padel-teal);
+  transform: scaleX(0);
+  transform-origin: bottom center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link-underline:hover::after,
+.exact-active-link::after {
+  transform: scaleX(1);
+}
+
+/* Slide Drawer Mobile Animation */
+.slide-drawer-enter-active,
+.slide-drawer-leave-active {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+.slide-drawer-enter-from,
+.slide-drawer-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Backdrop Fade Transition */
+.fade-backdrop-enter-active,
+.fade-backdrop-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-backdrop-enter-from,
+.fade-backdrop-leave-to {
+  opacity: 0;
+}
+
+
+
+
+

@@ -1,166 +1,255 @@
 <script setup>
+import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
 import { RouterLink } from 'vue-router'
-import zeeImg from '../assets/zee.png'
-import freyaImg from '../assets/freya.png'
-import graciaImg from '../assets/gracia.png'
-import christyImg from '../assets/christy.png'
 
-// Data member JKT48 untuk spotlight
-const members = [
-  {
-    id: 1,
-    name: 'Zee JKT48',
-    status: 'Active Mabar',
-    image: zeeImg,
-    mabarPrice: 'Rp 500,000'
-  },
-  {
-    id: 2,
-    name: 'Freya JKT48',
-    status: 'Active Mabar',
-    image: freyaImg,
-    mabarPrice: 'Rp 450,000'
-  },
-  {
-    id: 3,
-    name: 'Gracia JKT48',
-    status: 'Active Mabar',
-    image: graciaImg,
-    mabarPrice: 'Rp 500,000'
-  },
-  {
-    id: 4,
-    name: 'Christy JKT48',
-    status: 'Active Mabar',
-    image: christyImg,
-    mabarPrice: 'Rp 450,000'
+// Sub-components
+import OnboardingOverlay from '../components/OnboardingOverlay.vue'
+import RunningText from '../components/RunningText.vue'
+import ThreeCourtPreview from '../components/ThreeCourtPreview.vue'
+import CourtFeatures from '../components/CourtFeatures.vue'
+import EventPromo from '../components/EventPromo.vue'
+import MemberSpotlight from '../components/MemberSpotlight.vue'
+import DetailModal from '../components/DetailModal.vue'
+
+// Assets
+import bgHeroImg from '../assets/bg_hero.png'
+import bgFeaturesImg from '../assets/bg_features.png'
+import bgFacilitiesImg from '../assets/bg_facilities.png'
+import bgSpotlightImg from '../assets/bg_spotlight.png'
+
+const showHeader = inject('showHeader', null)
+
+// App states
+const showOnboarding = ref(false)
+const userPreference = ref('regular') // 'regular' atau 'jkt48'
+const isEntered = ref(false)
+const activeFeatureIndex = ref(0)
+const activeModal = ref(null)
+
+const handleOnboardingStart = () => {
+  showOnboarding.value = false
+  isEntered.value = true
+}
+
+// Lock body scroll and hide header when onboarding is shown
+watch(showOnboarding, (show) => {
+  if (show) {
+    document.body.classList.add('scroll-locked')
+    if (showHeader) showHeader.value = false
+  } else {
+    document.body.classList.remove('scroll-locked')
+    if (showHeader) showHeader.value = true
   }
-]
+}, { immediate: true })
 
+const handleSelectFeature = (payload) => {
+  activeModal.value = {
+    title: payload.title,
+    desc: payload.desc,
+    img: payload.img
+  }
+  if (payload.index !== undefined) {
+    activeFeatureIndex.value = payload.index
+  }
+}
 
+onMounted(() => {
+  const shown = sessionStorage.getItem('padel48_onboarding_shown')
+  if (shown !== 'true') {
+    showOnboarding.value = true
+  } else {
+    isEntered.value = true
+  }
+})
+
+onUnmounted(() => {
+  document.body.classList.remove('scroll-locked')
+  if (showHeader) showHeader.value = true
+})
 </script>
 
 <template>
-  <div class="relative min-h-screen flex flex-col bg-padel-dark overflow-hidden">
-    <!-- Background Decor (Glow Orbs) -->
-    <div class="absolute top-20 left-1/4 w-96 h-96 rounded-full bg-padel-teal/10 blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-20 right-1/4 w-96 h-96 rounded-full bg-padel-red/10 blur-[120px] pointer-events-none"></div>
+  <div
+    :class="[
+      'relative min-h-screen flex flex-col bg-padel-dark overflow-hidden transition-colors duration-500',
+      showOnboarding ? 'h-screen overflow-hidden' : 'snap-container',
+      userPreference === 'jkt48' ? 'theme-jkt48' : 'theme-regular'
+    ]"
+  >
+    <!-- Layar Onboarding Overlay -->
+    <OnboardingOverlay
+      v-if="showOnboarding"
+      @start="handleOnboardingStart"
+    />
 
-    <!-- Hero Section (Split Layout) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10">
-      <!-- Info Kiri -->
-      <div class="flex flex-col space-y-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-padel-red/30 bg-padel-red/5 text-padel-red text-xs font-semibold tracking-wider uppercase w-fit">
-          <span class="w-1.5 h-1.5 rounded-full bg-padel-red animate-ping"></span>
-          Eksklusif Sportainment
-        </div>
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-white">
-          Padel48: Play Padel with <span class="text-transparent bg-clip-text bg-gradient-to-r from-padel-red to-padel-teal">JKT48 Members</span>
-        </h1>
-        <p class="text-base sm:text-lg text-padel-gray max-w-lg">
-          Rasakan sensasi bermain padel di arena premium kami sekaligus dapatkan kesempatan bermain tanding bersama member JKT48 pilihanmu. Sehat, seru, dan tidak terlupakan!
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 pt-2">
-          <RouterLink to="/booking" class="px-8 py-3.5 rounded-full bg-padel-teal text-padel-dark font-bold text-center transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(102,252,241,0.5)] active:scale-95">
-            Book Court Now
-          </RouterLink>
-          <RouterLink to="/courts" class="px-8 py-3.5 rounded-full border border-white/20 hover:border-padel-teal text-white hover:text-padel-teal text-center font-semibold transition-all duration-300 bg-white/5 hover:bg-padel-teal/5">
-            Lihat Lapangan
-          </RouterLink>
-        </div>
+    <!-- Slide 1: Hero & Arena Viewport -->
+    <div class="snap-slide">
+      <!-- Background Image with Overlay -->
+      <div class="absolute inset-0 z-0 pointer-events-none">
+        <img
+          :src="bgHeroImg"
+          alt="Hero Background"
+          class="w-full h-full object-cover opacity-55 brightness-[0.4] contrast-[1.1] transition-transform duration-[12s] hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/90"></div>
       </div>
-
-      <!-- Hero Image Viewport Kanan -->
-      <div class="relative h-[350px] sm:h-[450px] w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-lg group">
-        <img src="/indoor_court.png" alt="Showcase Lapangan Padel48" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-        <div class="absolute inset-0 bg-gradient-to-t from-padel-dark/80 via-transparent to-transparent animate-fade-in"></div>
-        
-        <!-- UI overlay mini info -->
-        <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl flex items-center justify-between text-xs border border-white/5 backdrop-blur-md">
-          <span class="text-padel-teal flex items-center gap-1.5 font-semibold">
-            <span class="w-2 h-2 rounded-full bg-padel-teal animate-pulse"></span>
-            Showcase Lapangan Padel
-          </span>
-          <span class="text-white font-mono">Premium Indoor Arena</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Fitur Unggulan (Glassmorphism Cards) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full z-10">
-      <h2 class="text-3xl font-extrabold text-center text-white mb-10 tracking-tight">Fasilitas & Layanan Unggul</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Fasilitas 1 -->
-        <div class="glass-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-teal/30 transition-all duration-300 hover:translate-y-[-4px]">
-          <div class="w-12 h-12 rounded-xl bg-padel-teal/10 flex items-center justify-center text-padel-teal text-xl">🏆</div>
-          <h3 class="text-lg font-bold text-white">Premium Court Facility</h3>
-          <p class="text-sm text-padel-gray">
-            Lapangan padel standar internasional dengan karpet sintetis premium dan sistem pencahayaan LED anti-silau.
-          </p>
-        </div>
-
-        <!-- Fasilitas 2 -->
-        <div class="glass-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-red/30 transition-all duration-300 hover:translate-y-[-4px]">
-          <div class="w-12 h-12 rounded-xl bg-padel-red/10 flex items-center justify-center text-padel-red text-xl">❤️</div>
-          <h3 class="text-lg font-bold text-white">Exclusive Mabar JKT48</h3>
-          <p class="text-sm text-padel-gray">
-            Pesan sesi mabar bersama member favorit Anda. Didampingi pelatih berlisensi untuk pengalaman yang berkesan.
-          </p>
-        </div>
-
-        <!-- Fasilitas 3 -->
-        <div class="glass-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-teal/30 transition-all duration-300 hover:translate-y-[-4px]">
-          <div class="w-12 h-12 rounded-xl bg-padel-teal/10 flex items-center justify-center text-padel-teal text-xl">📱</div>
-          <h3 class="text-lg font-bold text-white">Instant QRIS Payment</h3>
-          <p class="text-sm text-padel-gray">
-            Proses checkout kilat dengan sistem generator pembayaran QRIS dinamis terverifikasi instan.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Member Spotlight Section (Holographic Cards) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full z-10">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
-        <div>
-          <h2 class="text-3xl font-extrabold text-white tracking-tight">Member Spotlight</h2>
-          <p class="text-sm text-padel-gray mt-1">Daftar member JKT48 yang siap bermain bareng Anda minggu ini</p>
-        </div>
-        <RouterLink to="/booking" class="mt-4 md:mt-0 text-sm font-semibold text-padel-teal hover:text-white flex items-center gap-1.5 transition-colors duration-200">
-          Lihat Jadwal Selengkapnya &rarr;
-        </RouterLink>
-      </div>
-
-      <!-- Grid Member -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="member in members" :key="member.id" class="group relative rounded-2xl overflow-hidden glass-panel border border-white/10 hover:border-padel-red/40 transition-all duration-500 hover:shadow-[0_0_20px_rgba(237,28,36,0.2)]">
-          <!-- Gambar Portrait -->
-          <div class="relative h-[280px] w-full overflow-hidden">
-            <img :src="member.image" :alt="member.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-            <div class="absolute inset-0 bg-gradient-to-t from-padel-dark via-transparent to-transparent"></div>
-            <!-- Badge Status -->
-            <span class="absolute top-4 left-4 px-2.5 py-0.5 rounded-full bg-padel-red/20 text-padel-red border border-padel-red/40 text-[10px] font-bold uppercase tracking-wider animate-pulse flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-padel-red"></span>
-              {{ member.status }}
-            </span>
+      
+      <!-- Hero Section (Split Layout) -->
+      <section
+        :class="[
+          'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10 transition-all duration-1000 ease-out transform',
+          isEntered ? 'opacity-100 scale-100 translate-y-0 blur-none' : 'opacity-0 scale-95 translate-y-8 blur-sm'
+        ]"
+      >
+        <!-- Info Kiri -->
+        <div
+          class="flex flex-col space-y-6 bg-black/65 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl relative z-10"
+        >
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-padel-red/30 bg-padel-red/5 text-padel-red text-xs font-semibold tracking-wider uppercase w-fit"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-padel-red animate-pulse"></span>
+            Eksklusif Sportainment
           </div>
-          
-          <!-- Detail Member -->
-          <div class="p-5 flex flex-col space-y-3 relative z-10 bg-padel-dark/90">
-            <div class="flex justify-between items-start">
-              <h3 class="text-lg font-bold text-white tracking-tight">{{ member.name }}</h3>
-              <span class="text-[10px] font-bold text-padel-gold border border-padel-gold/30 bg-padel-gold/5 px-2 py-0.5 rounded uppercase">VIP</span>
-            </div>
-            <div class="flex justify-between items-center text-xs text-padel-gray pt-1 border-t border-white/5">
-              <span>Mabar Add-on:</span>
-              <span class="font-bold text-white">{{ member.mabarPrice }}</span>
-            </div>
-            <RouterLink to="/booking" class="mt-2 w-full py-2 rounded-xl bg-padel-red/10 hover:bg-padel-red text-padel-red hover:text-white text-center text-sm font-bold transition-all duration-300 border border-padel-red/30">
-              Book Sesi Mabar
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-white">
+            Padel48: Play Padel with <span class="text-padel-teal">JKT48 Members</span>
+          </h1>
+          <p class="text-base sm:text-lg text-padel-gray max-w-lg leading-relaxed">
+            Rasakan sensasi bermain padel di arena premium kami sekaligus dapatkan kesempatan bermain tanding bersama member JKT48 pilihanmu. Sehat, seru, dan tidak terlupakan!
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <RouterLink
+              to="/booking"
+              class="px-8 py-3.5 rounded-full bg-padel-teal text-padel-dark font-bold text-center transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-padel-teal/10 active:scale-95"
+            >
+              Book Court Now
+            </RouterLink>
+            <RouterLink
+              to="/courts"
+              class="px-8 py-3.5 rounded-full border border-white/20 hover:border-padel-teal text-white hover:text-padel-teal text-center font-semibold transition-all duration-300 bg-white/5 hover:bg-padel-teal/5"
+            >
+              Lihat Lapangan
             </RouterLink>
           </div>
         </div>
+
+        <!-- Hero Viewport Kanan (3D Canvas / 2D Fallback) -->
+        <ThreeCourtPreview @select-feature="handleSelectFeature" />
+      </section>
+    </div>
+
+    <!-- Slide 2: Feature Slider & Running Text -->
+    <div class="snap-slide">
+      <!-- Background Image with Overlay -->
+      <div class="absolute inset-0 z-0 pointer-events-none">
+        <img
+          :src="bgFeaturesImg"
+          alt="Features Background"
+          class="w-full h-full object-cover opacity-55 brightness-[0.4] contrast-[1.1] transition-transform duration-[12s] hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/90"></div>
       </div>
-    </section>
+
+      <!-- Running Text Dinamis Responsif Scroll -->
+      <RunningText />
+
+      <!-- Slide Penjelasan Lapangan Padel (Interactive Slider) -->
+      <CourtFeatures v-model="activeFeatureIndex" />
+    </div>
+
+    <!-- Slide 3: Fasilitas Unggulan & Events -->
+    <div class="snap-slide">
+      <!-- Background Image with Overlay -->
+      <div class="absolute inset-0 z-0 pointer-events-none">
+        <img
+          :src="bgFacilitiesImg"
+          alt="Facilities Background"
+          class="w-full h-full object-cover opacity-55 brightness-[0.4] contrast-[1.1] transition-transform duration-[12s] hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/90"></div>
+      </div>
+      
+      <!-- Fitur Unggulan (Glassmorphism Cards) -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full z-10">
+        <h2 class="text-3xl font-extrabold text-center text-white mb-10 tracking-tight">
+          Fasilitas & Layanan Unggul
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Fasilitas 1 -->
+          <div
+            class="solid-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-teal/30 transition-all duration-300 hover:translate-y-[-4px]"
+          >
+            <div class="w-12 h-12 rounded-xl bg-padel-teal/10 flex items-center justify-center text-padel-teal text-xl">
+              🏆
+            </div>
+            <h3 class="text-lg font-bold text-white">Premium Court Facility</h3>
+            <p class="text-sm text-padel-gray">
+              Lapangan padel standar internasional dengan karpet sintetis premium dan sistem pencahayaan LED anti-silau.
+            </p>
+          </div>
+
+          <!-- Fasilitas 2 -->
+          <div
+            class="solid-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-red/30 transition-all duration-300 hover:translate-y-[-4px]"
+          >
+            <div class="w-12 h-12 rounded-xl bg-padel-red/10 flex items-center justify-center text-padel-red text-xl">
+              ❤️
+            </div>
+            <h3 class="text-lg font-bold text-white">Exclusive Mabar JKT48</h3>
+            <p class="text-sm text-padel-gray">
+              Pesan sesi mabar bersama member favorit Anda. Didampingi pelatih berlisensi untuk pengalaman yang berkesan.
+            </p>
+          </div>
+
+          <!-- Fasilitas 3 -->
+          <div
+            class="solid-panel p-6 rounded-2xl flex flex-col space-y-3 border border-white/5 hover:border-padel-teal/30 transition-all duration-300 hover:translate-y-[-4px]"
+          >
+            <div class="w-12 h-12 rounded-xl bg-padel-teal/10 flex items-center justify-center text-padel-teal text-xl">
+              📱
+            </div>
+            <h3 class="text-lg font-bold text-white">Instant QRIS Payment</h3>
+            <p class="text-sm text-padel-gray">
+              Proses checkout kilat dengan sistem generator pembayaran QRIS dinamis terverifikasi instan.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scrolling Event Informasi -->
+      <EventPromo />
+    </div>
+
+    <!-- Slide 4: Member Spotlight -->
+    <div class="snap-slide">
+      <!-- Background Image with Overlay -->
+      <div class="absolute inset-0 z-0 pointer-events-none">
+        <img
+          :src="bgSpotlightImg"
+          alt="Spotlight Background"
+          class="w-full h-full object-cover opacity-55 brightness-[0.4] contrast-[1.1] transition-transform duration-[12s] hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/90"></div>
+      </div>
+      
+      <!-- Member Spotlight Section -->
+      <MemberSpotlight />
+    </div>
+
+    <!-- Modal Detail Detail Objek -->
+    <DetailModal
+      :model="activeModal"
+      @close="activeModal = null"
+    />
   </div>
 </template>
+
+<style scoped>
+.solid-panel {
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+</style>

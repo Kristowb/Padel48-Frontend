@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import bgFacilitiesImg from '../assets/bg_facilities.png'
 
 const courts = [
   {
@@ -30,8 +31,14 @@ const selectedCourt = ref(courts[0])
 </script>
 
 <template>
-  <div class="relative min-h-screen bg-padel-dark text-white p-4 sm:p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto flex flex-col space-y-8">
+  <div class="relative min-h-screen bg-padel-dark text-white p-4 sm:p-6 lg:p-8 pt-24 sm:pt-28 overflow-hidden">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+      <img :src="bgFacilitiesImg" alt="Facilities Background" class="w-full h-full object-cover opacity-55 brightness-[0.4] contrast-[1.1]" />
+      <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/90"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto flex flex-col space-y-8 relative z-10">
       <!-- Header -->
       <div class="flex flex-col space-y-2">
         <h1 class="text-3xl font-extrabold text-white tracking-tight">Eksplorasi Lapangan Premium</h1>
@@ -53,62 +60,70 @@ const selectedCourt = ref(courts[0])
       <!-- Main Split Layout (3D Left, Details Right) -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
         <!-- Panel Showcase Gambar (Kiri) -->
-        <div class="relative h-[400px] lg:h-auto min-h-[400px] rounded-2xl border border-white/10 bg-black/50 overflow-hidden flex items-center justify-center group">
-          <img :src="selectedCourt.type === 'INDOOR' ? '/indoor_court.png' : '/outdoor_court.png'" 
-               :alt="selectedCourt.name" 
-               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          <div class="absolute inset-0 bg-gradient-to-t from-padel-dark/80 via-transparent to-transparent"></div>
+        <div class="relative h-[400px] lg:h-auto min-h-[400px] rounded-2xl border border-white/10 bg-black/50 backdrop-blur-md overflow-hidden flex items-center justify-center group">
+          <transition name="fade-scale" mode="out-in">
+            <img :key="selectedCourt.id"
+                 :src="selectedCourt.type === 'INDOOR' ? '/indoor_court.png' : '/outdoor_court.png'" 
+                 :alt="selectedCourt.name" 
+                 class="w-full h-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105" />
+          </transition>
+          <div class="absolute inset-0 bg-gradient-to-t from-padel-dark/80 via-transparent to-transparent pointer-events-none"></div>
 
           <!-- Label Float Info Showcase -->
-          <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl border border-white/5 backdrop-blur-md flex items-center justify-between text-xs">
+          <div class="absolute bottom-4 left-4 right-4 solid-panel p-3 rounded-xl flex items-center justify-between text-xs pointer-events-none">
             <span class="text-padel-teal flex items-center gap-1.5 font-semibold">
-              <span class="w-2 h-2 rounded-full bg-padel-teal animate-pulse"></span>
+              <span class="w-2 h-2 rounded-full bg-padel-teal"></span>
               {{ selectedCourt.type }} Showcase
             </span>
             <span class="text-padel-gray font-mono">Premium Arena View</span>
           </div>
         </div>
 
-        <!-- Panel Detail Lapangan (Kanan) -->
-        <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-white/10 flex flex-col justify-between space-y-6">
-          <div class="flex flex-col space-y-4">
-            <div class="flex items-center gap-3">
-              <span class="px-3 py-1 rounded bg-padel-teal/10 border border-padel-teal/30 text-padel-teal text-xs font-bold uppercase tracking-wider">
-                {{ selectedCourt.type }}
-              </span>
-              <span class="text-xs text-padel-gray font-mono">ID: {{ selectedCourt.id.slice(0,8) }}</span>
-            </div>
-            
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{{ selectedCourt.name }}</h2>
-            <p class="text-sm text-padel-gray leading-relaxed">{{ selectedCourt.description }}</p>
-            
-            <!-- Fasilitas Grid -->
-            <div class="pt-4 border-t border-white/5">
-              <h4 class="text-sm font-bold text-white mb-2">Fasilitas Penunjang:</h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div v-for="facility in selectedCourt.facilities" :key="facility" class="flex items-center gap-2 text-xs text-padel-gray">
-                  <span class="text-padel-teal">✔</span>
-                  {{ facility }}
+        <!-- Panel Detail Lapangan (Kanan - Menggunakan transition untuk transisi detail yang anggun) -->
+        <transition name="fade-scale" mode="out-in">
+          <div :key="selectedCourt.id" class="bg-black/65 backdrop-blur-xl border border-white/10 p-6 sm:p-8 rounded-3xl flex flex-col justify-between space-y-6 shadow-2xl relative z-10">
+            <div class="flex flex-col space-y-4">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded bg-padel-teal/10 border border-padel-teal/30 text-padel-teal text-xs font-bold uppercase tracking-wider">
+                  {{ selectedCourt.type }}
+                </span>
+                <span class="text-xs text-padel-gray font-mono">ID: {{ selectedCourt.id.slice(0,8) }}</span>
+              </div>
+              
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{{ selectedCourt.name }}</h2>
+              <p class="text-sm text-padel-gray leading-relaxed">{{ selectedCourt.description }}</p>
+              
+              <!-- Fasilitas Grid (Staggered Animation) -->
+              <div class="pt-4 border-t border-white/5">
+                <h4 class="text-sm font-bold text-white mb-2">Fasilitas Penunjang:</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div v-for="(facility, idx) in selectedCourt.facilities" 
+                       :key="facility" 
+                       :style="{ animationDelay: `${idx * 0.08}s` }"
+                       class="flex items-center gap-2 text-xs text-padel-gray stagger-item">
+                    <span class="text-padel-teal font-bold">✔</span>
+                    {{ facility }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Tarif & CTA -->
-          <div class="pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex flex-col">
-              <span class="text-[10px] text-padel-gray font-bold uppercase tracking-wider">Harga Sesi Reguler:</span>
-              <span class="text-xl font-black text-padel-teal">{{ selectedCourt.price }}</span>
-              <span class="text-[9px] text-padel-gold mt-1 flex items-center gap-1">
-                ⭐ Add-on Mabar JKT48: {{ selectedCourt.mabarPrice }}
-              </span>
+            <!-- Tarif & CTA -->
+            <div class="pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-padel-gray font-bold uppercase tracking-wider">Harga Sesi Reguler:</span>
+                <span class="text-xl font-black text-padel-teal">{{ selectedCourt.price }}</span>
+                <span class="text-[9px] text-padel-gold mt-1 flex items-center gap-1">
+                  ⭐ Add-on Mabar JKT48: {{ selectedCourt.mabarPrice }}
+                </span>
+              </div>
+              
+              <RouterLink to="/booking" class="px-6 py-3 rounded-xl bg-padel-teal hover:bg-padel-teal/90 text-padel-dark font-bold text-sm text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer">
+                Pilih & Booking Sekarang
+              </RouterLink>
             </div>
-            
-            <RouterLink to="/booking" class="px-6 py-3 rounded-xl bg-padel-teal hover:bg-padel-teal/90 text-padel-dark font-bold text-sm text-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]">
-              Pilih & Booking Sekarang
-            </RouterLink>
           </div>
-        </div>
+        </transition>
       </div>
     </div>
   </div>

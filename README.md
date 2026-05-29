@@ -473,3 +473,205 @@ sequenceDiagram
     ./mvnw spring-boot:run
     ```
     Server backend akan berjalan di port `8080`.
+
+---
+
+## 🎨 9. Peningkatan UI/UX Modern & Spesifikasi Eksklusif
+
+Bab ini mendefinisikan peningkatan spesifikasi antarmuka dan pengalaman pengguna (UI/UX) untuk mengoptimalkan performa interaksi 3D, meningkatkan konversi transaksi pada perangkat seluler (*mobile-first*), memanfaatkan antusiasme fans melalui fitur gamifikasi/social sharing, serta menyediakan fleksibilitas dalam pengelolaan slot waktu dan keadaan darurat.
+
+---
+
+### A. UX Interaksi 3D & Kinerja Pengguna
+
+Bagian ini berfokus pada memastikan kelancaran pemuatan halaman dan kemudahan navigasi pada elemen 3D interaktif lapangan.
+
+#### 1. Progressive Loading & Visual Fallback System
+*   **Masalah**: Perangkat berspesifikasi rendah dapat mengalami *blank screen*, *stuttering*, atau kegagalan pemuatan model 3D (WebGL tidak didukung/kehabisan memori).
+*   **Solusi Desain**:
+    *   **Skeletal Loading (Shimmer Preview)**: Selama model 3D di-load di latar belakang, tampilkan visual skeletal 2D/3D statis berukuran ringan dengan efek *shimmering pulse* yang merepresentasikan bentuk dasar lapangan padel.
+    *   **Pre-flight Performance Check**: Deteksi kemampuan perangkat. Jika WebGL tidak didukung atau FPS model 3D drop di bawah 20 FPS selama 3 detik berturut-turut, secara otomatis alihkan ke **2D Fallback Mode** (mengganti canvas 3D dengan render gambar berkualitas tinggi berformat WebP yang memiliki interaksi zona 2D SVG).
+    *   **Manual Toggle**: Sediakan tombol mengambang (*floating toggle*) bertuliskan `"Beralih ke Tampilan 2D"` di sudut kanan atas area visualisasi untuk memberikan kendali penuh kepada pengguna.
+
+#### 2. 3D Hover & Clickable Micro-Interactions
+*   **Masalah**: Pengguna tidak mengetahui bagian mana dari model 3D lapangan yang interaktif dan dapat diklik.
+*   **Solusi Desain**:
+    *   **Interactive Cursor State**: Saat kursor melintasi area interaktif (seperti area servis, jaring/net, atau raket 3D), kursor browser bertransisi dari `default` ke `pointer` dengan animasi riak kecil (*cursor ripple*).
+    *   **Bloom & Silhouette Effect**: Elemen lapangan yang disorot akan memancarkan efek neon glow (Bloom Post-Processing) berwarna merah khas JKT48 (untuk area VIP) atau neon teal (untuk area reguler). Komponen di sekitarnya meredup sekitar 30% untuk menciptakan kontras fokus yang tajam.
+    *   **Floating Contextual Tooltip**: Label informasi dinamis melayang di samping kursor saat melintasi objek interaktif. Contoh:
+        *   Menyorot Net: `"Net Lapangan - Ketinggian Standar Internasional (Klik untuk info)"`
+        *   Menyorot Area Servis: `"Area Bermain - Rumput Sintetis Premium (Klik untuk info)"`
+
+#### 3. Kriteria Keberhasilan UI/UX (Acceptance Criteria)
+*   [ ] **FCP (First Contentful Paint)** area visualisasi utama di bawah **1.5 detik** pada koneksi 3G/4G standar.
+*   [ ] Sistem fallback berhasil diuji dan memicu tampilan 2D dalam waktu kurang dari **3 detik** jika inisialisasi WebGL gagal.
+*   [ ] Skala kegunaan (*System Usability Scale / SUS*) pada aspek interaksi 3D mencapai skor minimum **80** dalam fase pengujian pengguna.
+
+#### 4. Skenario Wireframe & Layout yang Disarankan
+```
++-------------------------------------------------------------------+
+|  [Logo Padel48]                                    [Switch to 2D] |
++-------------------------------------------------------------------+
+|                                                                   |
+|                      +--------------------+                       |
+|                      |   [ Tooltip ]      |  <-- Mengambang dekat |
+|                      |   Area Servis      |      kursor           |
+|                      +--------------------+                       |
+|                                                                   |
+|                       / \                                         |
+|                      /   \    <-- Model Lapangan Padel 3D         |
+|                     /=====\       (Memiliki efek outline glow     |
+|                    / Servis\       saat kursor diarahkan)         |
+|                   +---------+                                     |
+|                                                                   |
++-------------------------------------------------------------------+
+```
+
+---
+
+### B. UX Pembayaran & Transaksi Seluler (Mobile-First QRIS)
+
+Mayoritas akses pemesanan Padel48 berasal dari perangkat seluler. QRIS statis biasa menyulitkan pengguna karena mereka tidak dapat memindai layar ponsel mereka sendiri.
+
+#### 1. Opsi Pembayaran Satu-Ketukan (One-Tap Payment Solutions)
+Untuk mempermudah transaksi pada ponsel pintar, halaman detail pembayaran QRIS harus dilengkapi dengan tombol aksi berikut:
+*   **Tombol "Unduh QR Code"**: Menyimpan gambar QR Code dinamis langsung ke galeri foto/unduhan ponsel pengguna dengan penamaan file instan (contoh: `PADEL48-QRIS-[BOOKING_CODE].png`).
+*   **Tombol "Salin Payload QRIS"**: Menyalin kode teks mentah standar EMVCo QRIS ke papan klip (*clipboard*) pengguna. Pengguna dapat langsung menempelkannya (*paste*) pada opsi "Import/Upload QR" di aplikasi perbankan/e-wallet tertentu.
+*   **App Deep-Linking / Instant E-Wallet Redirect**: Menyediakan tombol pintas pembayaran untuk aplikasi e-wallet populer (GoPay, OVO, Dana, LinkAja). Menggunakan URL scheme khusus untuk memicu pengalihan langsung ke aplikasi e-wallet dengan parameter nominal dan transaksi yang telah terisi (misalnya deep-link ke aplikasi GoPay/Dana).
+
+#### 2. Transisi Pending Payment & Visualisasi Penenang
+Menghilangkan rasa cemas pengguna selama proses verifikasi pembayaran berlangsung (polling 5 detik).
+*   **Animasi Mikro Non-Monoton**: Menampilkan animasi bola padel yang memantul secara dinamis melintasi net secara bolak-balik. Setiap pantulan memicu riak cahaya tipis pada net.
+*   **Progressive Status Message**: Mengganti teks status secara berkala untuk meyakinkan pengguna bahwa sistem sedang bekerja:
+    *   *Detik 0-5*: `"Menunggu konfirmasi pembayaran dari e-wallet Anda..."`
+    *   *Detik 6-10*: `"Sinyal pembayaran terdeteksi, memverifikasi transaksi..."`
+    *   *Detik >10*: `"Hampir selesai! Sedang menerbitkan tiket digital Anda..."`
+*   **Countdown Progress**: Menampilkan countdown timer 15 menit menggunakan indikator radial dengan warna gradasi yang melambangkan urgensi (hijau teal tenang -> kuning hangat -> merah lembut saat mendekati batas akhir).
+
+#### 3. Kriteria Keberhasilan UI/UX (Acceptance Criteria)
+*   [ ] Tombol "Unduh QR" berhasil mengunduh gambar beresolusi minimal 500x500 piksel dengan kontras kode QR yang terbaca sempurna oleh semua pemindai.
+*   [ ] Pengguna dapat menyelesaikan pembayaran seluler dalam waktu kurang dari **3 langkah** setelah QRIS diterbitkan (Klik Bayar -> Salin/Unduh/Redirect -> Buka Aplikasi -> Konfirmasi).
+*   [ ] Tingkat konversi pembayaran (*payment success rate*) setelah halaman checkout terbuka meningkat minimal **15%** pasca-implementasi.
+
+#### 4. Skenario Wireframe & Layout yang Disarankan
+```
++-------------------------------------------------------------------+
+|                         INVOICE #PADEL48                          |
++-------------------------------------------------------------------+
+|                                                                   |
+|                         [ QR Code Area ]                          |
+|                                                                   |
+|                      Countdown: 14m : 55s                         |
+|                                                                   |
+|      +-----------------------------------------------------+      |
+|      |               [   Unduh QR Code   ]                 |      |
+|      +-----------------------------------------------------+      |
+|      |            [  Salin Payload Text QRIS  ]            |      |
+|      +-----------------------------------------------------+      |
+|                                                                   |
+|       Bayar Cepat via Aplikasi:                                   |
+|       +--------------+  +--------------+  +--------------+        |
+|       |    GoPay     |  |     Dana     |  |     OVO      |        |
+|       +--------------+  +--------------+  +--------------+        |
+|                                                                   |
++-------------------------------------------------------------------+
+```
+
+---
+
+### C. Aspek Gamifikasi & Social Sharing (Fans JKT48 Engagement)
+
+Memanfaatkan antusiasme penggemar JKT48 untuk mendorong pemasaran organik yang viral.
+
+#### 1. Otomatisasi Poster Digital Sukses Pemesanan (Format 9:16)
+Setelah pembayaran berhasil dikonfirmasi (`PAID`), sistem akan secara otomatis merender poster digital siap-bagikan (*share-ready*) berukuran rasio 9:16 (cocok untuk Instagram Story atau WhatsApp Status):
+*   **Elemen Grafis**:
+    *   *Latar Belakang*: Gradasi warna merah sporty JKT48 ke hitam premium dengan pola bayangan lapangan padel.
+    *   *Data Dinamis*: Nama pemesan, tanggal bermain, sesi lapangan, dan waktu mabar.
+    *   *Foto Member*: Foto potret beresolusi tinggi member JKT48 terpilih yang bergaya sporty memegang raket padel.
+    *   *Signature Quote*: Pesan eksklusif tertera dari member terpilih (contoh: `"Sampai jumpa di lapangan padel! Aku tunggu smash terbaikmu! - Freya"`).
+*   **Tombol Web Share API**: Tombol `"Bagikan ke IG Story"` yang memicu dialog berbagi bawaan perangkat seluler atau langsung mengunduh gambar poster tersebut.
+
+#### 2. Tiket Digital Interaktif (Digital Wallet Experience)
+*   **Desain Kartu Koleksi**: Tiket digital dirancang menyerupai kartu VIP fisik transparan (*glassmorphic card*) dengan efek kemilau hologram yang memantulkan cahaya berdasarkan giroskop perangkat seluler.
+*   **Fitur Live Countdown**: Menampilkan *live ticker countdown* (Hari : Jam : Menit : Detik) yang terus berjalan menuju jam mulai bermain.
+*   **Integrasi Google & Apple Wallet**: Tombol pintas untuk menyimpan tiket ke Google Wallet atau Apple Wallet secara instan menggunakan format file `.pkpass` atau REST API Google Wallet.
+
+#### 3. Kriteria Keberhasilan UI/UX (Acceptance Criteria)
+*   [ ] Poster digital berhasil di-generate secara client-side menggunakan library seperti `html2canvas` dalam waktu di bawah **2 detik**.
+*   [ ] Teks pada poster digital memiliki keterbacaan (*readability*) kontras tinggi yang memenuhi standar WCAG AA.
+*   [ ] Pengukuran klik tombol bagikan (*social share rate*) mencapai minimal **40%** dari total transaksi sukses.
+
+#### 4. Skenario Wireframe & Layout yang Disarankan
+```
++-------------------------------------------------------------------+
+|                        PEMBAYARAN BERHASIL                        |
++-------------------------------------------------------------------+
+|                                                                   |
+|    +---------------------------------------------------------+    |
+|    |                 POSTER DIGITAL (9:16)                   |    |
+|    |                                                         |    |
+|    |   [ PADEL48 MATCH ]                                     |    |
+|    |   Nama: Wota Sejati                                     |    |
+|    |   Tanggal: 30 Mei 2026                                  |    |
+|    |   Mabar Bareng: Zee JKT48                               |    |
+|    |                                                         |    |
+|    |                   [ Foto Sporty Zee ]                   |    |
+|    |                                                         |    |
+|    |   "Siapkan energi terbaikmu ya!"                        |    |
+|    +---------------------------------------------------------+    |
+|                                                                   |
+|    +---------------------------------------------------------+    |
+|    |             [   Simpan Poster & Bagikan   ]             |    |
+|    +---------------------------------------------------------+    |
+|                                                                   |
++-------------------------------------------------------------------+
+```
+
+---
+
+### D. Fleksibilitas Slot Waktu & Penjadwalan
+
+Menyediakan fleksibilitas pemesanan bagi pemain padel serius dan skenario pemulihan kendala operasional secara transparan.
+
+#### 1. Pemesanan Durasi Dinamis (Dynamic Slot Grid)
+*   **Masalah**: Grid slot waktu yang kaku per 1 jam membatasi pengguna yang ingin menyewa selama 1,5 jam atau 2 jam secara terus-menerus.
+*   **Solusi Desain**:
+    *   **30-Minute Interval Steps**: Grid jadwal dipecah menjadi interval 30 menit (contoh: 07:00, 07:30, 08:00, ...).
+    *   **Multi-select / Drag-to-Select**: Pengguna memilih waktu mulai (*Start Time*) kemudian memilih waktu selesai (*End Time*). Kolom di antara pilihan tersebut otomatis terpilih dan berubah warna menjadi teal menyala.
+    *   **Dynamic Pricing Calculation**: Total nominal harga di Floating Checkout Bar memperbarui perhitungan secara dinamis sesuai dengan jumlah slot 30 menit yang dipilih (misal: 1,5 jam = 1.5 x tarif dasar sewa).
+
+#### 2. Kebijakan Fallback Visual Kehadiran Member JKT48
+*   **Masalah**: Member JKT48 mendadak berhalangan hadir karena alasan kesehatan, jadwal mendadak dari manajemen, atau keadaan darurat lainnya.
+*   **Solusi Desain (Fallback Policy Modal)**:
+    Sistem akan mendeteksi pembatalan jadwal member dan secara proaktif menampilkan pop-up penyesuaian kepada pengguna yang terkena dampak. Pengguna diberikan 3 pilihan aksi visual yang jelas:
+    *   **Refund Dana 100% (Instant Return)**: Menampilkan rincian nominal dan tombol konfirmasi untuk memicu pengembalian dana penuh secara otomatis melalui QRIS refund/transfer bank.
+    *   **Reschedule Instan (Jadwal Ulang)**: Membuka kalender interaktif berisi daftar tanggal kehadiran pengganti member yang bersangkutan tanpa dikenakan biaya tambahan.
+    *   **Alihkan ke Sesi Reguler + Refund Selisih**: Mengubah status pemesanan menjadi sesi bermain reguler (lapangan tetap dapat digunakan), dan secara otomatis mengembalikan selisih harga sesi mabar dengan sesi reguler ke e-wallet pengguna.
+
+#### 3. Kriteria Keberhasilan UI/UX (Acceptance Criteria)
+*   [ ] Grid slot dinamis mencegah pemesanan tumpang tindih (*overlap*) dengan akurasi validasi 100% di sisi klien.
+*   [ ] Pengguna yang terdampak pembatalan member menerima notifikasi popup fallback dalam waktu kurang dari **1 menit** setelah pembatalan di-input oleh admin.
+*   [ ] Keputusan fallback (Refund/Reschedule/Reguler) dapat diselesaikan dalam waktu kurang dari **45 detik** oleh pengguna.
+
+#### 4. Skenario Wireframe & Layout yang Disarankan
+```
++-------------------------------------------------------------------+
+|                  PILIH SLOT DURASI BERMAIN                        |
++-------------------------------------------------------------------+
+|                                                                   |
+|   Mulai: [ 16:00 ]   v                   Selesai: [ 17:30 ]   v   |
+|                                                                   |
+|   Jadwal Slot Waktu (Interval 30 Mnt):                            |
+|   +---------+  +---------+  +---------+  +---------+              |
+|   |  15:00  |  |  15:30  |  | [16:00] |  | [16:30] |  <-- Terpilih|
+|   +---------+  +---------+  +---------+  +---------+              |
+|   | [17:00] |  |  17:30  |  |  18:00  |  |  18:30  |              |
+|   +---------+  +---------+  +---------+  +---------+              |
+|                                                                   |
+|   +-------------------------------------------------------------+ |
+|   | Durasi: 1.5 Jam  |  Total Bayar: Rp 375.000                 | |
+|   +-------------------------------------------------------------+ |
+|                                                                   |
++-------------------------------------------------------------------+
+```
