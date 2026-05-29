@@ -1,7 +1,6 @@
 <script setup>
-import { ref, shallowRef, watch } from 'vue'
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { TresCanvas } from '@tresjs/core'
 
 const courts = [
   {
@@ -27,14 +26,7 @@ const courts = [
 ]
 
 const selectedCourt = ref(courts[0])
-const court3DRef = shallowRef(null)
 
-// Animasi rotasi manual berdasarkan input/watch atau auto
-const onBeforeRender = (e) => {
-  if (court3DRef.value) {
-    court3DRef.value.rotation.y += 0.003
-  }
-}
 </script>
 
 <template>
@@ -60,53 +52,20 @@ const onBeforeRender = (e) => {
 
       <!-- Main Split Layout (3D Left, Details Right) -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-        <!-- Panel 3D Interaktif (Kiri) -->
-        <div class="relative h-[400px] lg:h-auto min-h-[400px] rounded-2xl border border-white/10 bg-black/50 overflow-hidden flex items-center justify-center">
-          <TresCanvas class="absolute inset-0 w-full h-full" clear-color="#0a0a0c">
-            <TresPerspectiveCamera :position="[0, 4, 8]" :look-at="[0, 0, 0]" />
-            
-            <ambientLight :intensity="1.5" />
-            <directionalLight :position="[5, 8, 5]" :intensity="1.8" />
-            <pointLight :position="[-5, 5, -5]" :intensity="1.2" color="#66FCF1" />
+        <!-- Panel Showcase Gambar (Kiri) -->
+        <div class="relative h-[400px] lg:h-auto min-h-[400px] rounded-2xl border border-white/10 bg-black/50 overflow-hidden flex items-center justify-center group">
+          <img :src="selectedCourt.type === 'INDOOR' ? '/indoor_court.png' : '/outdoor_court.png'" 
+               :alt="selectedCourt.name" 
+               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-padel-dark/80 via-transparent to-transparent"></div>
 
-            <group ref="court3DRef" @before-render="onBeforeRender">
-              <!-- Lantai Lapangan Dynamic Color -->
-              <mesh :rotation="[-Math.PI / 2, 0, 0]" :position="[0, -0.1, 0]">
-                <planeGeometry :args="[6, 4]" />
-                <meshStandardMaterial :color="selectedCourt.color" roughness="0.8" />
-              </mesh>
-              
-              <!-- Garis Lapangan -->
-              <mesh :rotation="[-Math.PI / 2, 0, 0]" :position="[0, -0.09, 0]">
-                <planeGeometry :args="[5.8, 3.8]" />
-                <meshStandardMaterial color="#ffffff" roughness="0.5" wireframe />
-              </mesh>
-
-              <!-- Jaring Jala -->
-              <mesh :position="[0, 0.2, 0]">
-                <boxGeometry :args="[0.05, 0.4, 4]" />
-                <meshStandardMaterial color="#222222" opacity="0.7" transparent />
-              </mesh>
-
-              <!-- Glass Walls (Dinding Kaca Belakang Lapangan Padel) -->
-              <mesh :position="[-3, 0.8, 0]">
-                <boxGeometry :args="[0.02, 1.8, 4]" />
-                <meshStandardMaterial color="#66FCF1" opacity="0.15" transparent roughness="0.1" metalness="0.9" />
-              </mesh>
-              <mesh :position="[3, 0.8, 0]">
-                <boxGeometry :args="[0.02, 1.8, 4]" />
-                <meshStandardMaterial color="#66FCF1" opacity="0.15" transparent roughness="0.1" metalness="0.9" />
-              </mesh>
-            </group>
-          </TresCanvas>
-
-          <!-- Label Float Info 3D -->
-          <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl border border-white/5 pointer-events-none flex items-center justify-between text-xs">
-            <span class="text-padel-teal flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-padel-teal animate-ping"></span>
-              {{ selectedCourt.type }} View
+          <!-- Label Float Info Showcase -->
+          <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl border border-white/5 backdrop-blur-md flex items-center justify-between text-xs">
+            <span class="text-padel-teal flex items-center gap-1.5 font-semibold">
+              <span class="w-2 h-2 rounded-full bg-padel-teal animate-pulse"></span>
+              {{ selectedCourt.type }} Showcase
             </span>
-            <span class="text-padel-gray">Rotate & Explore 3D Model</span>
+            <span class="text-padel-gray font-mono">Premium Arena View</span>
           </div>
         </div>
 

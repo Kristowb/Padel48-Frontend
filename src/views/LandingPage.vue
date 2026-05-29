@@ -1,7 +1,5 @@
 <script setup>
-import { shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
-import { TresCanvas } from '@tresjs/core'
 import zeeImg from '../assets/zee.png'
 import freyaImg from '../assets/freya.png'
 import graciaImg from '../assets/gracia.png'
@@ -39,14 +37,7 @@ const members = [
   }
 ]
 
-// Refs untuk animasi 3D rotasi lapangan
-const courtRef = shallowRef(null)
 
-const onBeforeRender = (e) => {
-  if (courtRef.value) {
-    courtRef.value.rotation.y += 0.005
-  }
-}
 </script>
 
 <template>
@@ -79,64 +70,18 @@ const onBeforeRender = (e) => {
         </div>
       </div>
 
-      <!-- 3D Viewport Kanan -->
-      <div class="relative h-[350px] sm:h-[450px] w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-inner flex items-center justify-center">
-        <!-- Interactive 3D Canvas -->
-        <TresCanvas class="absolute inset-0 w-full h-full" clear-color="#0b0c10">
-          <TresPerspectiveCamera :position="[0, 5, 8]" :look-at="[0, 0, 0]" />
-          
-          <ambientLight :intensity="1.5" />
-          <directionalLight :position="[5, 8, 5]" :intensity="2" />
-          <pointLight :position="[-5, 5, -5]" :intensity="1.5" color="#66FCF1" />
-          <pointLight :position="[5, 5, 5]" :intensity="1.5" color="#ED1C24" />
-
-          <!-- Group Lapangan Padel 3D -->
-          <group ref="courtRef" @before-render="onBeforeRender">
-            <!-- Lantai Lapangan -->
-            <mesh :rotation="[-Math.PI / 2, 0, 0]" :position="[0, -0.1, 0]">
-              <planeGeometry :args="[6, 4]" />
-              <meshStandardMaterial color="#0b5e40" roughness="0.8" />
-            </mesh>
-            
-            <!-- Garis Lapangan Putih -->
-            <mesh :rotation="[-Math.PI / 2, 0, 0]" :position="[0, -0.09, 0]">
-              <planeGeometry :args="[5.8, 3.8]" />
-              <meshStandardMaterial color="#ffffff" roughness="0.5" wireframe />
-            </mesh>
-
-            <!-- Tiang & Jaring di Tengah -->
-            <mesh :position="[0, 0.2, 0]">
-              <boxGeometry :args="[0.05, 0.4, 4]" />
-              <meshStandardMaterial color="#222222" opacity="0.6" transparent />
-            </mesh>
-
-            <!-- Tiang Sudut (Visualisasi Court Cage) -->
-            <mesh :position="[-3, 1, -2]">
-              <boxGeometry :args="[0.1, 2, 0.1]" />
-              <meshStandardMaterial color="#111111" />
-            </mesh>
-            <mesh :position="[3, 1, -2]">
-              <boxGeometry :args="[0.1, 2, 0.1]" />
-              <meshStandardMaterial color="#111111" />
-            </mesh>
-            <mesh :position="[-3, 1, 2]">
-              <boxGeometry :args="[0.1, 2, 0.1]" />
-              <meshStandardMaterial color="#111111" />
-            </mesh>
-            <mesh :position="[3, 1, 2]">
-              <boxGeometry :args="[0.1, 2, 0.1]" />
-              <meshStandardMaterial color="#111111" />
-            </mesh>
-          </group>
-        </TresCanvas>
+      <!-- Hero Image Viewport Kanan -->
+      <div class="relative h-[350px] sm:h-[450px] w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 shadow-lg group">
+        <img src="/indoor_court.png" alt="Showcase Lapangan Padel48" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-padel-dark/80 via-transparent to-transparent animate-fade-in"></div>
         
-        <!-- UI overlay mini info di 3D canvas -->
-        <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl flex items-center justify-between text-xs border border-white/5 pointer-events-none">
-          <span class="text-padel-gray flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-padel-teal animate-ping"></span>
-            3D Interactive Preview
+        <!-- UI overlay mini info -->
+        <div class="absolute bottom-4 left-4 right-4 glass-panel p-3 rounded-xl flex items-center justify-between text-xs border border-white/5 backdrop-blur-md">
+          <span class="text-padel-teal flex items-center gap-1.5 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-padel-teal animate-pulse"></span>
+            Showcase Lapangan Padel
           </span>
-          <span class="text-white font-mono">Rotasi Lapangan Padel</span>
+          <span class="text-white font-mono">Premium Indoor Arena</span>
         </div>
       </div>
     </section>
